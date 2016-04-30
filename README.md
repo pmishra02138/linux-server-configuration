@@ -228,7 +228,7 @@ The catalog web app can be accesed through following links:
   * Restart apache server  
     `$ sudo service apache2 restart`
 
-  ### 9.3 Clone git repository and make it web inaccessible
+### 9.3 Clone git repository and make it web inaccessible
 
   * Clone catalog project from github  
     `$ git clone https://github.com/pmishra02138/fullstack-vm.git`
@@ -244,3 +244,38 @@ The catalog web app can be accesed through following links:
         `$ cd /var/www/catalog/` and `$ sudo nano .htaccess`
       * Paste in the following:  
         `RedirectMatch 404 /\.git`
+
+10. Inistall and configure PostgreSQL database
+----------------------------------------------
+
+  * Install PostgreSQL  
+    `$ sudo apt-get install postgresql postgresql-contrib`
+  * Create a user catalog  
+    `sudo adduser catalog`
+  * Change to default user postgres:  
+    `$ sudo su - postgres`
+  * Connect to database  
+    `$ psql`
+  * Add postgre user with password:  
+    * Create user with LOGIN role and set a password:  
+      `# CREATE USER catalog WITH PASSWORD 'PWD-DB';`
+    * Allow the user to create database tables:  
+      `# ALTER USER catalog CREATEDB;`
+  * Create database:  
+    `# CREATE DATABASE catalog WITH OWNER catalog;`
+  * Connect to the database catalog
+    `# \c catalog`
+  * Revoke all rights:  
+    `# REVOKE ALL ON SCHEMA public FROM public;`
+  * Grant only access to the catalog role:  
+    `# GRANT ALL ON SCHEMA public TO catalog;`
+  * Exit out of PostgreSQl and the postgres user:  
+    `# \q`, then `$ exit`
+  * Open the database setup file:  
+    `$ sudo nano populatecatalog.py`
+  * Change the line starting with "engine" to:  
+    ```python
+    engine = create_engine('postgresql://catalog:PWD-DB@localhost/catalog')
+    ```  
+  * Create postgreSQL database schema:  
+    `$ python populatecatalog.py`
