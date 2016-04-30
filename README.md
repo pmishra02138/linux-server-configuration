@@ -287,4 +287,22 @@ The catalog web app can be accesed through following links:
     `$ mv project.py __init__.py`
   * Restart apache server  
     `$ sudo service apache2 restart`
-  * To access the application, opena  broswer and type http://52.37.200.141 
+  * To access the application, open a  broswer and type: http://52.37.200.141
+
+11. Configure Google+ authorization
+-----------------------------------
+
+  * Open the Apache configuration file:
+    `$ sudo nano /etc/apache2/sites-available/catalog.conf`
+  * Paste following line below ServerAdmin: `ServerAlias HOSTNAME`, e.g. http://ec2-52-37-200-141.us-west-2.compute.amazonaws.com/
+  * Enable the virtual host:  
+  `$ sudo a2ensite catalog`
+  * To get the Google+ authorization working:
+    * Go to the project on the Developer Console
+    * Navigate to APIs & auth > Credentials > Edit Settings
+    * Add your host name and public IP-address to your Authorized JavaScript origins and your host name + oauth2callback to Authorized redirect URIs, e.g. http://ec2-52-37-200-141.us-west-2.compute.amazonaws.com/oauth2callback
+  * Restart apache server:
+    `$ sudo service apache2 restart`
+  * To access the application, opena  broswer and type either   
+    http://52.37.200.141 or  
+    http://ec2-52-37-200-141.us-west-2.compute.amazonaws.com/
