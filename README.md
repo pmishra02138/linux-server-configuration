@@ -86,7 +86,7 @@ The catalog web app can be accesed through following links:
   * Check identity `$ whoami`
 
 7. Configure uncomplicated firewall (UFW)
------------------------------------
+-----------------------------------------
   * Configure to allow SSH (port 2220) and HTTP (port 80)  
 
     ```console
@@ -141,3 +141,106 @@ The catalog web app can be accesed through following links:
      * Starting NTP server ntpd
        ...done.
     ```
+
+8. Install and configure Apache to serve a mod wsgi application
+---------------------------------------------------------------
+  * Install apache and mod wsgi  
+    `$ sudo apt-get install apache2 libapache2-mod-wsgi`
+  * Enable mod wsgi  
+    ```
+    $ sudo a2enmod wsgi
+    Module wsgi already enabled
+    ```
+  * Test the website
+    ```console
+    $ curl -I http://52.37.200.141
+    HTTP/1.1 200 OK
+    Date: Sat, 30 Apr 2016 15:05:10 GMT
+    Server: Apache/2.4.7 (Ubuntu)
+    Content-Length: 2832
+    Vary: Accept-Encoding
+    Content-Type: text/html; charset=utf-8
+    ```
+
+9. Setup catalog project
+------------------------
+
+### 9.1 Install git and configure settings
+
+  * Install Git:  
+    `$ sudo apt-get install git`
+  * Set your name, e.g. for the commits:  
+    `$ git config --global user.name "NAME"`
+  * Set up your email address to connect your commits to your account:      
+  `$ git config --global user.email "EMAIL ADDRESS"`  
+
+### 9.2 Setup apache for flask web app
+
+  * Install pip installer  
+    `$ sudo apt-get install python-pip`
+
+  * Install all python requirements
+    `$ sudo pip install -r requirements.txt`
+
+  * Create a catalog directory
+    `$ mkdir \var\www\catalog`
+    `$ mkdir \var\www\catalog\catalog`
+
+  * Configure and enable a virtual host
+    ```console
+    $ sudo nano /etc/apache2/sites-available/catalog.conf
+
+      <VirtualHost *:80>
+          ServerName PUBLIC-IP-ADDRESS
+          ServerAdmin admin@PUBLIC-IP-ADDRESS
+          WSGIScriptAlias / /var/www/catalog/catalog.wsgi
+          <Directory /var/www/catalog/catalog/>
+              Order allow,deny
+              Allow from all
+          </Directory>
+          Alias /static /var/www/catalog/catalog/static
+          <Directory /var/www/catalog/catalog/static/>
+              Order allow,deny
+              Allow from all
+          </Directory>
+          ErrorLog ${APACHE_LOG_DIR}/error.log
+          LogLevel warn
+          CustomLog ${APACHE_LOG_DIR}/access.log combined
+      </VirtualHost>
+
+    $ sudo a2ensite catalog
+    ```
+
+  * Create a mod-wsgi file and restart apache
+    ```console
+    $ cd /var/www/catalog
+    $ nano /var/www/catalog/catalog.wsgi
+
+    #!/usr/bin/python
+    import sys
+    import logging
+    logging.basicConfig(stream=sys.stderr)
+    sys.path.insert(0,"/var/www/catalog/")
+
+    from catalog import app as application
+    application.secret_key = 'super_secret_key'
+    ```
+  * Restart apache server  
+    `$ sudo service apache2 restart`
+
+  ### 9.3 Clone git repository and make it web inaccessible
+
+  * Clone catalog project from github  
+    `$ git clone https://github.com/pmishra02138/fullstack-vm.git`
+
+  * Move the contenets of catalog project to var folder
+    `$ mv fullstack-vm/vagrant/catalog/* /var/www/catalog/catalog/`
+
+  * Delete rest of the cloned git repository  
+    `$ rm -rf fullstack-vm`
+
+  * Make the GitHub repository inaccessible:  
+      * Create and open .htaccess file:  
+        `$ cd /var/www/catalog/` and `$ sudo nano .htaccess`
+      * Paste in the following:  
+        `RedirectMatch 404 /\.git`
