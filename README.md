@@ -245,8 +245,8 @@ The catalog web app can be accesed through following links:
       * Paste in the following:  
         `RedirectMatch 404 /\.git`
 
-10. Inistall and configure PostgreSQL database
-----------------------------------------------
+10. Install and configure PostgreSQL database
+---------------------------------------------
 
   * Install PostgreSQL  
     `$ sudo apt-get install postgresql postgresql-contrib`
@@ -279,3 +279,12 @@ The catalog web app can be accesed through following links:
     ```  
   * Create postgreSQL database schema:  
     `$ python populatecatalog.py`
+
+10. Run application
+-------------------
+
+  * Rename project.py  
+    `$ mv project.py __init__.py`
+  * Restart apache server  
+    `$ sudo service apache2 restart`
+  * To access the application, opena  broswer and type http://52.37.200.141 
